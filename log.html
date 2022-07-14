@@ -5,7 +5,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content="Robot Framework 4.0.3 (Python 3.10.5 on win32)" name="Generator">
+<meta content="Robot Framework 5.0.1 (Python 3.10.5 on win32)" name="Generator">
 <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKcAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAqAAAAAAAAAAAAAAAAAAAALIAAAD/AAAA4AAAANwAAADcAAAA3AAAANwAAADcAAAA3AAAANwAAADcAAAA4AAAAP8AAACxAAAAAAAAAKYAAAD/AAAAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC/AAAA/wAAAKkAAAD6AAAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AAAD/AAAA+gAAAMMAAAAAAAAAAgAAAGsAAABrAAAAawAAAGsAAABrAAAAawAAAGsAAABrAAAADAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAIsAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAANEAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAAAAAAAAMgAAADIAAAAyAAAAMgAAADIAAAAyAAAAMgAAADIAAAAFAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAADwAAAB8AAAAAAAAAGAAAABcAAAAAAAAAH8AAABKAAAAAAAAAAAAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAADCAAAA/wAAACkAAADqAAAA4QAAAAAAAAD7AAAA/wAAALAAAAAGAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAIwAAAP4AAAD/AAAA/wAAAGAAAAAAAAAAAAAAAMkAAAD/AAAAigAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAAAAAAAIAAAAcAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAA2gAAAP8AAAD7AAAAywAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN4AAAD/AAAAqwAAAP8AAACvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALIAAAD/AAAAsgAAAAAAAAC5AAAA/wAAAMoAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMkAAAD/AAAAvAAAAAAAAAAAAAAAAAAAAKwAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAArQAAAAAAAAAAwAMAAIABAAAf+AAAP/wAAD/8AAAgBAAAP/wAAD/8AAA//AAAJIwAADHEAAA//AAAP/wAAB/4AACAAQAAwAMAAA==">
 <style media="all" type="text/css">
 /* Generic and misc styles */
@@ -319,6 +319,9 @@ th.stats-col-graph:hover {
     padding: 3px;
     cursor: default;
 }
+.element-header .label {
+    margin-right: 0.5em;
+}
 .name {
     font-weight: bold;
 }
@@ -588,10 +591,10 @@ function drawCallback(element, childElement, childrenNames) {
     }
 }
 function expandSuite(suite) {
-    if (suite.status == "PASS")
-        expandElement(suite);
-    else
+    if (suite.status == "FAIL")
         expandFailed(suite);
+    else
+        expandElement(suite);
 }
 function expandElement(item, retryCount) {
     retryCount = typeof retryCount !== 'undefined' ? retryCount : 3;
@@ -966,6 +969,7 @@ window.model = (function () {
     }
     function Keyword(data) {
         var kw = createModelObject(data);
+        var flatTypes = ['RETURN', 'BREAK', 'CONTINUE'];
         kw.libname = data.libname;
         kw.fullName = (kw.libname ? kw.libname + '.' : '') + kw.name;
         kw.type = data.type;
@@ -1350,8 +1354,8 @@ window.testdata = function () {
     var _statistics = null;
     var LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FAIL', 'SKIP'];
     var STATUSES = ['FAIL', 'PASS', 'SKIP', 'NOT RUN'];
-    var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'VAR', 'IF', 'ELSE IF', 'ELSE'];
-    var MESSAGE_TYPE = 8;
+    var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'ITERATION', 'IF', 'ELSE IF', 'ELSE', 'RETURN',
+                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK'];
     function addElement(elem) {
         if (!elem.id)
             elem.id = uniqueId();
@@ -1372,10 +1376,10 @@ window.testdata = function () {
                 elapsed];
     }
     function createMessage(element, strings) {
-        return model.Message(LEVELS[element[2]],
-                             util.timestamp(element[1]),
-                             strings.get(element[3]),
-                             strings.get(element[4]));
+        return model.Message(LEVELS[element[1]],
+                             util.timestamp(element[0]),
+                             strings.get(element[2]),
+                             strings.get(element[3]));
     }
     function parseStatus(stats) {
         return STATUSES[stats[0]];
@@ -1386,9 +1390,12 @@ window.testdata = function () {
         };
     }
     function createBodyItem(parent, element, strings, index) {
-        if (element[0] == MESSAGE_TYPE)
+        if (element.length < 5)
             return createMessage(element, strings);
-        return createKeyword(parent, element, strings, index);
+        var messages = util.filter(parent.children(), function (child) {
+            return child.type == 'message';
+        })
+        return createKeyword(parent, element, strings, index - messages.length);
     }
     function createKeyword(parent, element, strings, index) {
         var kw = model.Keyword({
@@ -1796,31 +1803,31 @@ function stopPropagation(event) {
 window.output = {};
 </script>
 <script type="text/javascript">
-window.output["suite"] = [1,2,3,0,[],[0,0,8324],[],[[4,0,5,[],[0,5958,4,6],[[0,7,0,0,0,0,0,0,[0,5960,0],[[8,5960,5,6]]],[0,8,0,0,0,0,0,0,[3,5960,0],[]],[0,9,0,0,0,0,0,0,[3,5961,0],[]],[0,10,11,0,12,0,0,0,[3,5962,0],[]]]],[13,0,14,[],[0,5964,3,6],[[0,7,0,0,0,0,0,0,[0,5965,0],[[8,5965,5,6]]],[0,15,0,0,0,0,0,0,[3,5966,0],[]],[0,16,0,0,0,0,0,0,[3,5966,0],[]]]],[13,0,17,[],[0,5969,3,6],[[0,7,0,0,0,0,0,0,[0,5970,0],[[8,5970,5,6]]],[0,18,11,0,19,20,0,0,[3,5970,0],[]],[0,21,0,0,0,0,0,0,[3,5971,0],[]]]]],[[1,22,0,0,0,0,0,0,[1,540,5417],[[0,23,11,0,24,25,0,0,[1,540,5417],[[8,540,2,26]]]]],[2,27,11,0,28,0,0,0,[1,5975,2349],[]]],[3,0,3,0]];
+window.output["suite"] = [1,2,3,0,[],[0,0,157,4],[],[[5,0,0,[],[0,142,0,6],[]]],[[1,7,0,0,0,0,0,0,[0,142,0],[[142,5,8]]],[2,9,10,0,11,0,0,0,[1,157,0],[]]],[1,0,1,0]];
 </script>
 <script type="text/javascript">
 window.output["strings"] = [];
 </script>
 <script type="text/javascript">
-window.output["strings"] = window.output["strings"].concat(["*","*Searchfun","*C:\\Users\\srava\\PycharmProjects\\AluTest\\Testcases\\searchfun.robot","*Testcases/searchfun.robot","*Search_funationality","*<p>Search results displayed should be relevant to search keyword\x3c/p>","*Keyword with same name defined multiple times.","*Verify the Homepage","*Input Keyword and verify the Search result page","*Verify Relevant searched products displayed","*Close Browser","*SeleniumLibrary","*<p>Closes the current browser.\x3c/p>","*Search_functionality_2","*<p>% Sign in search keyword should not redirect to 404 ERROR\x3c/p>","*Input % in to Search text Field","*Verify 404 Error page not displaying","*<p>When user start typing word in text box it should suggest words that matches typed keyword\x3c/p>","*Input Text","*<p>Types the given <code>text\x3c/code> into the text field identified by <code>locator\x3c/code>.\x3c/p>","*${Search_textfield, Prism","*Verify_auto_suggetions","*open my browser","*Open Browser","*<p>Opens a new browser instance to the optional <code>url\x3c/code>.\x3c/p>","*${URL}, chrome","*Opening browser 'chrome' to base url '<a href=\"https://www.ddecor.com/\">https://www.ddecor.com/\x3c/a>'.","*Close All Browsers","*<p>Closes all open browsers and resets the browser cache.\x3c/p>","*Error in test case file 'C:\\Users\\srava\\PycharmProjects\\AluTest\\Testcases\\searchfun.robot': Creating keyword 'Verify the Homepage' failed: Keyword with same name defined multiple times.","*Multiple test cases with name 'Search_functionality_2' executed in test suite 'Searchfun'."]);
+window.output["strings"] = window.output["strings"].concat(["*","*SignUp Form","*C:\\Users\\chnga\\PycharmProjects\\AluTest\\Testcases\\Signup_Form\\SignUp_Form.robot","*Testcases/Signup_Form/SignUp_Form.robot","*Suite setup failed:\nNo keyword with name 'Open Sign_Up Page' found.","*Invalid_testcase","*Parent suite setup failed:\nNo keyword with name 'Open Sign_Up Page' found.","*Open Sign_Up Page","*No keyword with name 'Open Sign_Up Page' found.","*Close All Browsers","*SeleniumLibrary","*<p>Closes all open browsers and resets the browser cache.\x3c/p>","*Error in file 'C:\\Users\\chnga\\PycharmProjects\\AluTest\\Testcases\\Signup_Form\\SignUp_Form.robot' on line 4: Variable file '..\\PageObjects\\Signup_form.py' does not exist.","*Error in file 'C:\\Users\\chnga\\PycharmProjects\\AluTest\\Testcases\\Signup_Form\\SignUp_Form.robot' on line 5: Variable file '..\\TestData\\Testdata.py' does not exist.","*Error in file 'C:\\Users\\chnga\\PycharmProjects\\AluTest\\Testcases\\Signup_Form\\SignUp_Form.robot' on line 6: Resource file '..\\Resources\\PLP_Keywords.robot' does not exist.","*Error in file 'C:\\Users\\chnga\\PycharmProjects\\AluTest\\Testcases\\Signup_Form\\SignUp_Form.robot' on line 8: Resource file '..\\Resources\\SignUP_Form_Keywords.robot' does not exist.","*[ DataDriver ] Error in robot file:\n  File \"C:\\Users\\chnga\\PycharmProjects\\AluTest\\Testcases\\Signup_Form\\SignUp_Form.robot\", line 0","*In source file:\n  File \"../TestData/Testdata_Signup.xlsx\", line 0","*Calling method '_start_suite' of listener 'DataDriver' failed: FileNotFoundError: File attribute was not a full path. Tried to find C:\\Users\\chnga\\PycharmProjects\\AluTest\\Testcases\\Signup_Form\\../TestData/Testdata_Signup.xlsx but file does not exist."]);
 </script>
 <script type="text/javascript">
-window.output["stats"] = [[{"elapsed":"00:00:00","fail":3,"label":"All Tests","pass":0,"skip":0}],[],[{"elapsed":"00:00:08","fail":3,"id":"s1","label":"Searchfun","name":"Searchfun","pass":0,"skip":0}]];
+window.output["stats"] = [[{"elapsed":"00:00:00","fail":1,"label":"All Tests","pass":0,"skip":0}],[],[{"elapsed":"00:00:00","fail":1,"id":"s1","label":"SignUp Form","name":"SignUp Form","pass":0,"skip":0}]];
 </script>
 <script type="text/javascript">
-window.output["errors"] = [[8,0,4,29],[8,5968,3,30]];
+window.output["errors"] = [[126,4,12],[126,4,13],[126,4,14],[142,4,15],[142,4,16],[142,4,17],[142,4,18]];
 </script>
 <script type="text/javascript">
-window.output["baseMillis"] = 1657101240102;
+window.output["baseMillis"] = 1657788473293;
 </script>
 <script type="text/javascript">
-window.output["generated"] = 8373;
+window.output["generated"] = 157;
 </script>
 <script type="text/javascript">
 window.output["expand_keywords"] = null;
 </script>
 <script type="text/javascript">
-window.settings = {"defaultLevel":"INFO","minLevel":"INFO","reportURL":"report.html","rpa":false,"splitLogBase":"log","title":""};
+window.settings = {"defaultLevel":"INFO","minLevel":"FAIL","reportURL":"report.html","rpa":false,"splitLogBase":"log","title":""};
 </script>
 <title></title>
 </head>
@@ -2120,7 +2127,7 @@ function addExecutionLog(main) {
     <div class="element-header closed" onclick="toggleKeyword('${id}')">
       <div class="element-header-left" title="${type}  {{if name}}{{html fullName}}  {{/if}}[${status}]">
         <span class="elapsed" title="Elapsed time">${times.elapsedTime}</span>
-        <span class="label keyword ${status.toLowerCase()}">${type}</span>
+        <span class="label ${status.toLowerCase()}">${type}</span>
         <span>{{html assign}}</span>
         <span class="name"><span class="parent-name">{{html libname}}{{if libname}} . {{/if}}</span>{{html name}}</span>
         <span class="arg">{{html arguments}}</span>
@@ -2128,7 +2135,7 @@ function addExecutionLog(main) {
       <div class="element-header-right" onclick="stopPropagation(event)">
         <a class="expand" title="Expand all" href="javascript:expandAll('${id}')"></a>
         <a class="collapse" title="Collapse all" href="javascript:collapseAll('${id}')"></a>
-        <a class="link" title="Link to this keyword" href="#${id}" onclick="makeElementVisible('${id}')"></a>
+        <a class="link" title="Link to this item" href="#${id}" onclick="makeElementVisible('${id}')"></a>
       </div>
       <div class="element-header-toggle" title="Toggle visibility"></div>
     </div>

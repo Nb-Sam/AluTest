@@ -1,19 +1,14 @@
 *** Settings ***
 Library     SeleniumLibrary
 Library    XML
-#Variables   ../PageObjects/Search.py
 Variables   ../TestData/Testdata.py
-Resource    ../Resources/PLP_Keywords.robot
-#Variables   ../PageObjects/PLP_page_Objects.py
+Resource        ../Resources/Common_Keywords.robot
 
-
-
-
-Suite Setup     open my browser
-Suite Teardown      Close All Browsers
+Test Setup     Open Chrome Browser
+Test Teardown      Close All Browsers
 
 *** Variables ***
-${URL}      https://www.ddecor.com/
+
 ${Placeholder_text}   "Search entire store here..."
 *** Test Cases ***
 testcase01
@@ -22,12 +17,6 @@ testcase01
         Input Keyword into search text field
         Verify Search Result page
         Verify Relevant searched products displayed
-Testcase02
-        [Documentation]  % Sign in search keyword should not redirect to 404 ERROR
-        Click on Search
-        Input % in to Search text Field
-        Verify Search Result page
-        Verify 404 Error page not displaying
 
 testcase03
         [Documentation]  For ecommerce sites - search keyword should suggest similar kind of product/items
@@ -59,8 +48,12 @@ testcase06
         Log To Console    ${search_text_field_placeholder_text}
         Element Attribute Value Should Be    ${Search_textfield}    placeholder    Search entire store here...
 
-
-
+Testcase02
+        [Documentation]  % Sign in search keyword should not redirect to 404 ERROR
+        Click on Search
+        Input % in to Search text Field
+        Verify Search Result page
+        Verify 404 Error page not displaying
 
 
 *** Keywords ***
@@ -78,13 +71,8 @@ Click on Search
 Input % in to Search text Field
     Input Text    ${Search_textfield}       %
     Press Keys      NONE    ENTER
-open my browser
-    Open Browser     ${URL}      chrome
-    Close pop up and Verify Homepage
 Verify Homepage
     Element Should Be Visible    ${Search_button}
-Close PopUp
-    click element    ${close_popup}
 Input Keyword into search text field
     Input Text    ${Search_textfield}    Prism
     Press Keys      NONE    ENTER
@@ -95,10 +83,7 @@ Verify Relevant searched products displayed
         FOR    ${Product}    IN   @{Products}
             Log To Console    ${Product.text}
         END
-Close pop up and Verify Homepage
-        Close PopUp
-        Set Selenium Implicit Wait    5 seconds
-        Verify Homepage
+
 
 
 

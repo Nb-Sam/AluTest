@@ -31,7 +31,7 @@ SingUp_mage_error = "//div[@class='mage-error']"
 
 # homepage locators
 Profile_icon = "//i[@class='meigee-account']"
-Signup_link = "//div[@class='options-dropdown']//*[contains(text(),'Sign Up')]"
+Signup_link = "//a[@id='idXFW4zaNx']"
 
 
 
