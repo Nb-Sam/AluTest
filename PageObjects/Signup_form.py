@@ -7,7 +7,7 @@ Sign_up_for_news_letter = "//label[@for=is_subscribed]"
 DOB_Day_dropdown = "//select[@name='dob_day']"
 DOB_Month_dropdown = "name:dob_month"
 DOB_year_dropdown = "name:dob_year"
-Gender_dropdown : "//select[@id='gender']"
+Gender_dropdown = "//select[@id='gender']"
 Password = "id:password"
 Confirm_password = "id:password-confirmation"
 Back_button = "//a[@class='action back']"
@@ -31,7 +31,7 @@ SingUp_mage_error = "//div[@class='mage-error']"
 
 # homepage locators
 Profile_icon = "//i[@class='meigee-account']"
-Signup_link = "//div[@class='options-dropdown']//*[contains(text(),'Sign Up')]"
+Signup_link = "//a[@id='idXFW4zaNx']"
 
 
 
