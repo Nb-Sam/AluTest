@@ -7,8 +7,6 @@ Resource    ../Resources/PLP_Keywords.robot
 #Variables   ../PageObjects/PLP_page_Objects.py
 
 
-
-
 Suite Setup     open my browser
 Suite Teardown      Close All Browsers
 

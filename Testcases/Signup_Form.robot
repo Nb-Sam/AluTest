@@ -7,9 +7,8 @@ Resource    ../Resources/PLP_Keywords.robot
 Library     DataDriver   ../TestData/Testdata_Signup.xlsx
 
 
-Suite Setup     open my browser
+Suite Setup     Open Sign_Up Page
 Suite Teardown      Close All Browsers
-
 Test Template       SingnUp_from_Invalid_Testcases
 
 *** Variables ***
@@ -18,7 +17,7 @@ ${URL}      https://www.ddecor.com/
 @{month_List}       MM   January     February       March       April       May     June    July    August   September      October     November  December
 @{Gender_list}      ${EMPTY}        Male        FEMALE
 *** Test Cases ***
-Invalid_testcases   Using   ${Firstname_field}      ${Lastname_field}       ${Email_field}      ${Mobile_field}        ${Password_field}       ${Confirm_Password_field}
+Invalid_testcase   Using        ${Firstname_field}     ${Lastname_field}       ${Email_field}      ${Mobile_field}        ${Password_field}         ${Confirm_Password_field}
 
 #testcase
  #   Mouse Over    ${Profile_icon}
@@ -31,7 +30,7 @@ Invalid_testcases   Using   ${Firstname_field}      ${Lastname_field}       ${Em
  #   Error should be Displayed
 *** Keywords ***
 SingnUp_from_Invalid_Testcases
-        [Arguments]     ${Firstname_field}      ${Lastname_field}       ${Email_field}      ${Mobile_field}      ${Password_field}       ${Confirm_Password_field}
+        [Arguments]         ${Firstname_field}      ${Lastname_field}       ${Email_field}      ${Mobile_field}      ${Password_field}       ${Confirm_Password_field}
         Input Text    ${Firstname}     ${Firstname_field}
         Input Text    ${Lastname}    ${Lastname_field}
         Input Text    ${Email}    ${Email_field}
@@ -42,6 +41,7 @@ SingnUp_from_Invalid_Testcases
         Verify the Month Dropdown
         Verify the Year Drop down
         Validate the Gender Drop down
+        Select Gender
         Select valid date of Birth
         Set Selenium Implicit Wait    10
         Click on submit button
@@ -53,7 +53,7 @@ Verify the Day
             Continue For Loop If    "${a}"=="DD"
             FOR    ${ran}    IN RANGE    1    19
                 IF  ${a} == ${ran}
-                    #Log To Console    ${a}
+                    Log To Console    ${a}
                 END
             END
         END
@@ -85,7 +85,8 @@ Verify the Month Dropdown
             #Log To Console    ${Month_M} Drop down Verified
         END
         ${Month_default_selection}=     Get Selected List Value    name:dob_month
-
+Select Gender
+    Select From List By Index    ${Gender_dropdown}     2
 Verify the Year Drop down
         @{Year_list}=   Get List Items    ${DOB_year_dropdown}
         ${max}=    Evaluate    max(@{Year_list})
@@ -128,17 +129,14 @@ Click on submit button
         
 
 
-        
 
-
-
-open my browser
+Open Sign_Up Page
     Open Browser     ${URL}      chrome
-    Close pop up and Verify Homepage
-    Open SignUp page
+    Go To    https://www.ddecor.com/customer/account/create/
+
 
 Close pop up and Verify Homepage
-        Close PopUp
+        Run Keyword And Continue On Failure    Close PopUp
         Set Selenium Implicit Wait    5 seconds
         Verify Homepage
 Close PopUp
@@ -146,8 +144,4 @@ Close PopUp
 Verify Homepage
     Element Should Be Visible    ${Search_button}
 
-Open SignUp page
-    Mouse Over      ${Profile_icon}
-    Sleep    2
-    Click Link     ${Signup_link}
 
