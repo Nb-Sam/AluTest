@@ -9,7 +9,7 @@ Resource    ../Resources/Common_Keywords.robot
 
 
 
-Suite Setup     Open Chrome Browser
+Suite Setup     Open chrome browser DDT
 Suite Teardown      Close All Browsers
 Test Template       SingnUp_from_Invalid_Testcases
 
@@ -37,6 +37,8 @@ SingnUp_from_Invalid_Testcases
         Set Selenium Implicit Wait    10
         Click on submit button
         Error should be Displayed
-        
 
-
+Open chrome browser DDT
+    Open Chrome Browser
+    Mouse Over   ${Profile_icon}
+    Click Element    ${Signup_link}
