@@ -17,7 +17,7 @@ Test Template       SingnUp_from_Invalid_Testcases
 
 
 *** Test Cases ***
-Invalid_testcase   Using        ${Firstname_field}     ${Lastname_field}       ${Email_field}      ${Mobile_field}        ${Password_field}         ${Confirm_Password_field}
+Invalid_testcase Using ${Firstname_field} ${Lastname_field} ${Email_field} ${Mobile_field} ${Password_field}         ${Confirm_Password_field}
 
 *** Keywords ***
 SingnUp_from_Invalid_Testcases

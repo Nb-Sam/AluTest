@@ -1,4 +1,4 @@
-#Search functionality Locators
+# Search functionality Locators
 
 Auto_suggestion_name = "//li[@data-type='IN_FIELD']"
 Search_button = "//i[@class='meigee-search']"
