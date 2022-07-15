@@ -24,6 +24,7 @@ User Login
 #    Open My Browser
     Go To    ${HomePageUrl}
     Close PopUp
+    Logout From Existing Session
     Go To Sign Form
     Input Username  ${UserName}
     Input Passwd    ${Password}
@@ -31,13 +32,13 @@ User Login
     Set Global Variable    $end_of_test     ${False}
     IF    "${UserName}" == "${EMPTY}"
         Element Should Be Visible    ${Email_Error}
-        Login Should Fail
+        State Should Not Be Logged In
         Set Global Variable    $end_of_test     ${True}
     END
     IF    "${end_of_test}" == "${False}"
         IF    "${Password}" == "${EMPTY}"
             Element Should Be Visible    ${Password_error}
-            Login Should Fail
+            State Should Not Be Logged In
             Set Global Variable    $end_of_test     ${True}
         END
     END
@@ -48,7 +49,7 @@ User Login
     #         Should Not Be True    "${UserName}" == "${EMPTY}"
         EXCEPT
             Element Should Be Visible    ${Email_Error}
-            Login Should Fail
+            State Should Not Be Logged In
             Set Global Variable    $end_of_test     ${True}
         END
     END
@@ -57,16 +58,17 @@ User Login
         FOR    ${profile}    IN    @{Valid_User_info_list}
             IF    '${UserName}' == '${profile["User_ID"]}'
                 IF    '${Password}' == '${profile["Password"]}'
-                    Login Should Pass
+                    State Should Be Logged In
                     Sleep    5
+                    Close PopUp
                     Click Logout Header Link
-                    Logout Should Pass
+                    State Should Be Logged Out
                     Sleep    5
                     Set Global Variable    $userMatched     ${True}
                     Set Global Variable    $end_of_test     ${True}
                     Exit For Loop
                 ELSE
-                    Login Should Fail
+                    State Should Not Be Logged In
                     Set Global Variable    $end_of_test     ${True}
                     Exit For Loop
                 END
@@ -77,7 +79,7 @@ User Login
     END
     IF    "${end_of_test}" == "${False}"
         IF    ${userMatched} == ${False}
-            Login Should Fail
+            State Should Not Be Logged In
             Set Global Variable    $end_of_test     ${True}
         END
     END

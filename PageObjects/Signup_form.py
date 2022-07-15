@@ -1,4 +1,4 @@
-#Sing up form x path's
+# Sing up form x path's
 Firstname = "id:firstname"
 Lastname = "id:lastname"
 Email = "name:email"
@@ -31,7 +31,7 @@ SingUp_mage_error = "//div[@class='mage-error']"
 
 # homepage locators
 Profile_icon = "//i[@class='meigee-account']"
-Signup_link = "//a[@id='idXFW4zaNx']"
+Signup_link = "//div[@class='dropdown-item account']//a[text()='Sign Up']"
 
 
 

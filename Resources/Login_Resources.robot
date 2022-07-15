@@ -56,23 +56,30 @@ Open Login Form
 Submit Filled Up Login Form
     Click Button    ${Signin_submit_button}
 
-Login Should Fail
+State Should Not Be Logged In
     Page Should Contain Element    ${Login_Header_Link}
     Page Should Not Contain Element    ${Logout_Header_Link}
-#    Sleep    10
 
-Login Should Pass
+State Should Be Logged In
     Page Should Not Contain Element    ${Login_Header_Link}
     Page Should Contain Element    ${Logout_Header_Link}
 
-Logout Should Fail
+State Should Not Be Logged Out
     Page Should Not Contain Element    ${Login_Header_Link}
     Page Should Contain Element    ${Logout_Header_Link}
-#    Sleep    10
 
-Logout Should Pass
+State Should Be Logged Out
     Page Should Contain Element    ${Login_Header_Link}
     Page Should Not Contain Element    ${Logout_Header_Link}
+
+Logout From Existing Session
+    TRY
+        Page Should Not Contain Element    ${Logout_Header_Link}
+    EXCEPT
+        Click Logout Header Link
+        Sleep    5
+        State Should Be Logged In
+    END
 
 Validate Sign In Form
     [Documentation]  Inspect different elements on Sign In form

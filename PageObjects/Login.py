@@ -1,4 +1,4 @@
-# Login functionality Locators
+# Login Page Element Locators
 
 User_icon = "//i[@class='meigee-account']"
 Login_Header_Link = "//div[@class='dropdown-item account']//a[text()='Log In']"
